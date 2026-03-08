@@ -40,6 +40,6 @@ if st.button("Prossimo esercizio ➡️"):
     st.session_state.indice = random.randint(0, len(esercizi) - 1)
     st.rerun()
 
----
 st.sidebar.header("Informazioni")
+
 st.sidebar.write("Questa app è stata creata per scopi didattici gratuiti.")
