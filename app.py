@@ -4,7 +4,7 @@ import pandas as pd
 
 # 1. INSERISCI QUI IL TUO LINK DI GOOGLE FOGLI
 # Ricorda: deve finire con /export?format=csv
-URL_FOGLIO = "IL_TUO_LINK_QUI"
+URL_FOGLIO = "https://docs.google.com/spreadsheets/d/18jIREltozGiHiCnNljLHqRFF-oMnj-hDDJ5yhH3rWDk/export?format=csv"
 
 # Configurazione della pagina
 st.set_page_config(page_title="ITALO! Quiz online", page_icon="🇮🇹")
@@ -68,3 +68,4 @@ else:
 
 st.sidebar.header("Informazioni")
 st.sidebar.write("App didattica collegata a Google Sheets.")
+
