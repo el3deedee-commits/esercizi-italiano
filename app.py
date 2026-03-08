@@ -47,6 +47,13 @@ if st.button("Prossimo esercizio ➡️"):
     st.session_state.indice = random.randint(0, len(esercizi) - 1)
     st.rerun()
 
+# Bottone per azzerare il punteggio
+if st.button("Reset Punteggio 🔄"):
+    st.session_state.punteggio = 0
+    st.session_state.totali = 0
+    st.rerun()
+    
 st.sidebar.header("Informazioni")
 st.sidebar.write("Questa app è stata creata per scopi didattici gratuiti.")
+
 
