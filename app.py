@@ -2,10 +2,10 @@ import streamlit as st
 import random
 
 # Configurazione della pagina
-st.set_page_config(page_title="Palestra di Italiano", page_icon="🇮🇹")
+st.set_page_config(page_title="ITALO! Quiz online", page_icon="🇮🇹")
 
-st.title("Benvenuti alla Palestra di Italiano!")
-st.write("Esercitati con la grammatica in modo semplice e veloce.")
+st.title("ITALO! Quiz online")
+st.write("Gli esercizi per le nostre lezioni.")
 
 # Database degli esercizi
 esercizi = [
@@ -49,3 +49,4 @@ if st.button("Prossimo esercizio ➡️"):
 
 st.sidebar.header("Informazioni")
 st.sidebar.write("Questa app è stata creata per scopi didattici gratuiti.")
+
