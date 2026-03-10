@@ -17,42 +17,41 @@ def aggiungi_sfondo(url_immagine):
     st.markdown(
         f"""
         <style>
-        /* Crea un livello sotto tutto il resto per l'immagine */
-        .stApp {{
-            background: none;
-        }}
         .stApp::before {{
             content: "";
             background-image: url("{url_immagine}");
             background-attachment: fixed;
             background-size: cover;
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            /* REGOLA QUI L'OPACITÀ: 0.2 è molto velato, 0.5 è più visibile */
+            top: 0; left: 0; width: 100%; height: 100%;
             opacity: 0.25; 
             z-index: -1;
         }}
-        
-        /* Contenitore principale degli esercizi */
         .main .block-container {{
             background-color: rgba(255, 255, 255, 0.7); 
             border-radius: 25px;
             padding: 40px;
             margin-top: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }}
         </style>
         """,
         unsafe_allow_html=True
     )
 
-# Link immagine Colosseo
+# Funzione per lo squillo di tromba
+def suona_tromba():
+    # Link a un suono di fanfara/tromba gratuito
+    audio_url = "https://www.myinstants.com/media/sounds/trumpet-fanfare.mp3"
+    audio_html = f"""
+        <audio autoplay>
+            <source src="{audio_url}" type="audio/mp3">
+        </audio>
+    """
+    st.markdown(audio_html, unsafe_allow_html=True)
+
 aggiungi_sfondo("https://images.unsplash.com/photo-1552832230-c0197dd311b5?q=80&w=1996")
 
-# --- 3. CARICAMENTO DATI (CON PROTEZIONE CELLE VUOTE) ---
+# --- 3. CARICAMENTO DATI ---
 @st.cache_data(ttl=60)
 def carica_esercizi(url):
     try:
@@ -77,11 +76,12 @@ if not df_completo.empty:
         st.session_state.indice = 0
         st.session_state.punteggio = 0
         st.session_state.totali = 0
+        st.session_state.finito = False # Nuova variabile per gestire il finale
 
     st.title(f"🏛️ {scelta_argomento}")
     st.metric(label="Punteggio", value=f"{st.session_state.punteggio} su {st.session_state.totali}")
 
-    if st.session_state.esercizi_scelti:
+    if st.session_state.esercizi_scelti and not st.session_state.finito:
         es = st.session_state.esercizi_scelti[st.session_state.indice]
         st.write(f"**Esercizio {st.session_state.indice + 1} di {len(st.session_state.esercizi_scelti)}**")
         
@@ -93,7 +93,6 @@ if not df_completo.empty:
             opzioni = [opt.strip() for opt in match_opzioni.group(1).split(',')]
             st.subheader(domanda_pulita)
             scelta = st.radio("Scegli la risposta:", opzioni, index=None, key=f"r_{st.session_state.indice}")
-            
             if st.button("Verifica"):
                 if scelta:
                     st.session_state.totali += 1
@@ -102,8 +101,7 @@ if not df_completo.empty:
                         st.session_state.punteggio += 1
                     else:
                         st.error(f"Sbagliato. La risposta corretta era: {es['risposta']}")
-                else:
-                    st.warning("Seleziona un'opzione!")
+                else: st.warning("Seleziona un'opzione!")
         else:
             st.subheader(testo_domanda)
             risposta_utente = st.text_input("Scrivi qui la tua risposta:", key=f"i_{st.session_state.indice}").strip().lower()
@@ -116,19 +114,24 @@ if not df_completo.empty:
                     st.error(f"Sbagliato. La risposta era: {es['risposta']}")
 
         st.divider()
-        c1, c2, c3 = st.columns(3)
-        with c1:
-            if st.button("Prossimo ➡️"):
-                if st.session_state.indice < len(st.session_state.esercizi_scelti) - 1:
-                    st.session_state.indice += 1
-                    st.rerun()
-                else:
-                    st.balloons()
-                    st.info("Lezione terminata!")
-        with c3:
-            if st.button("Nuova sfida 🔄"):
-                st.session_state.argomento_attivo = None
+        if st.button("Prossimo ➡️"):
+            if st.session_state.indice < len(st.session_state.esercizi_scelti) - 1:
+                st.session_state.indice += 1
+                st.rerun()
+            else:
+                st.session_state.finito = True
                 st.rerun()
 
-st.sidebar.markdown("---")
-st.sidebar.write("In bocca al lupo con lo studio! 🇮🇹")
+    # --- SCHERMATA FINALE CON TROMBA E PALLONCINI ---
+    elif st.session_state.finito:
+        st.balloons()
+        suona_tromba()
+        st.header("🎊 Lezione Completata!")
+        st.subheader(f"Hai ottenuto un punteggio di {st.session_state.punteggio} su {len(st.session_state.esercizi_scelti)}")
+        
+        if st.button("Ricomincia questa lezione 🔄"):
+            st.session_state.argomento_attivo = None
+            st.session_state.finito = False
+            st.rerun()
+else:
+    st.warning("Carica i dati nel foglio Google!")
