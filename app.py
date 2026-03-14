@@ -32,30 +32,25 @@ def aggiungi_sfondo(url_immagine):
             border-radius: 25px;
             padding: 40px;
             margin-top: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }}
         </style>
         """,
         unsafe_allow_html=True
     )
 
-# Funzione per l'applauso
-def applauso():
-    # Link a un applauso gratuito
-    audio_url = "https://www.myinstants.com/media/sounds/applause_8.mp3"
-    audio_html = f"""
-        <audio autoplay>
-            <source src="{audio_url}" type="audio/mp3">
-        </audio>
-    """
-    st.markdown(audio_html, unsafe_allow_html=True)
-
 aggiungi_sfondo("https://images.unsplash.com/photo-1552832230-c0197dd311b5?q=80&w=1996")
+
+# Titoli dell'app
+st.title("ITALO! Quiz online")
+st.write("Gli esercizi per le nostre lezioni.")
 
 # --- 3. CARICAMENTO DATI ---
 @st.cache_data(ttl=60)
 def carica_esercizi(url):
     try:
         df = pd.read_csv(url)
+        # Pulisce le righe vuote
         df = df.dropna(subset=['argomento', 'domanda'])
         return df
     except:
@@ -65,9 +60,11 @@ df_completo = carica_esercizi(URL_FOGLIO)
 
 if not df_completo.empty:
     st.sidebar.title("📚 Menu Lezioni")
+    # Protezione TypeError: dropna + astype(str)
     lista_argomenti = sorted(df_completo['argomento'].dropna().astype(str).unique().tolist())
     scelta_argomento = st.sidebar.selectbox("Scegli cosa studiare:", lista_argomenti)
 
+    # Inizializzazione sessione per nuovo argomento
     if 'argomento_attivo' not in st.session_state or st.session_state.argomento_attivo != scelta_argomento:
         st.session_state.argomento_attivo = scelta_argomento
         tutte_le_domande = df_completo[df_completo['argomento'] == scelta_argomento].to_dict('records')
@@ -76,10 +73,10 @@ if not df_completo.empty:
         st.session_state.indice = 0
         st.session_state.punteggio = 0
         st.session_state.totali = 0
-        st.session_state.finito = False # Nuova variabile per gestire il finale
+        st.session_state.finito = False
 
-    st.title(f"🏛️ {scelta_argomento}")
-    st.metric(label="Punteggio", value=f"{st.session_state.punteggio} su {st.session_state.totali}")
+    st.subheader(f"🏛️ Sezione: {scelta_argomento}")
+    st.metric(label="Punteggio attuale", value=f"{st.session_state.punteggio} su {st.session_state.totali}")
 
     if st.session_state.esercizi_scelti and not st.session_state.finito:
         es = st.session_state.esercizi_scelti[st.session_state.indice]
@@ -88,11 +85,13 @@ if not df_completo.empty:
         testo_domanda = str(es['domanda'])
         match_opzioni = re.search(r'\[(.*?)\]', testo_domanda)
         
+        # Gestione Risposta Multipla o Aperta
         if match_opzioni:
             domanda_pulita = testo_domanda.split('[')[0].strip()
             opzioni = [opt.strip() for opt in match_opzioni.group(1).split(',')]
-            st.subheader(domanda_pulita)
-            scelta = st.radio("Scegli la risposta:", opzioni, index=None, key=f"r_{st.session_state.indice}")
+            st.write(f"### {domanda_pulita}")
+            scelta = st.radio("Seleziona la risposta:", opzioni, index=None, key=f"r_{st.session_state.indice}")
+            
             if st.button("Verifica"):
                 if scelta:
                     st.session_state.totali += 1
@@ -101,17 +100,21 @@ if not df_completo.empty:
                         st.session_state.punteggio += 1
                     else:
                         st.error(f"Sbagliato. La risposta corretta era: {es['risposta']}")
-                else: st.warning("Seleziona un'opzione!")
+                else:
+                    st.warning("Seleziona un'opzione!")
         else:
-            st.subheader(testo_domanda)
+            st.write(f"### {testo_domanda}")
             risposta_utente = st.text_input("Scrivi qui la tua risposta:", key=f"i_{st.session_state.indice}").strip().lower()
             if st.button("Verifica"):
-                st.session_state.totali += 1
-                if risposta_utente == str(es['risposta']).lower().strip():
-                    st.success("Ottimo lavoro! 🎉")
-                    st.session_state.punteggio += 1
+                if risposta_utente:
+                    st.session_state.totali += 1
+                    if risposta_utente == str(es['risposta']).lower().strip():
+                        st.success("Ottimo lavoro! 🎉")
+                        st.session_state.punteggio += 1
+                    else:
+                        st.error(f"Sbagliato. La risposta era: {es['risposta']}")
                 else:
-                    st.error(f"Sbagliato. La risposta era: {es['risposta']}")
+                    st.warning("Scrivi una risposta!")
 
         st.divider()
         if st.button("Prossimo ➡️"):
@@ -122,16 +125,20 @@ if not df_completo.empty:
                 st.session_state.finito = True
                 st.rerun()
 
-    # --- SCHERMATA FINALE CON APPLAUSO E PALLONCINI ---
+    # --- SCHERMATA FINALE CON APPLAUSI ---
     elif st.session_state.finito:
         st.balloons()
-        applauso()
+        
+        # Audio degli applausi
+        audio_url = "https://www.myinstants.com/media/sounds/applause_8.mp3"
+        st.components.v1.html(
+            f"""
+            <audio autoplay>
+                <source src="{audio_url}" type="audio/mp3">
+            </audio>
+            """,
+            height=0,
+        )
+        
         st.header("🎊 Lezione Completata!")
         st.subheader(f"Hai ottenuto un punteggio di {st.session_state.punteggio} su {len(st.session_state.esercizi_scelti)}")
-        
-        if st.button("Ricomincia questa lezione 🔄"):
-            st.session_state.argomento_attivo = None
-            st.session_state.finito = False
-            st.rerun()
-else:
-    st.warning("Carica i dati nel foglio Google!")
