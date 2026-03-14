@@ -34,6 +34,13 @@ def aggiungi_sfondo(url_immagine):
             margin-top: 30px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }}
+        /* Stile per l'istruzione */
+        .istruzione-testo {{
+            color: #555;
+            font-style: italic;
+            font-size: 0.9em;
+            margin-bottom: -10px;
+        }}
         </style>
         """,
         unsafe_allow_html=True
@@ -50,7 +57,7 @@ st.write("Gli esercizi per le nostre lezioni.")
 def carica_esercizi(url):
     try:
         df = pd.read_csv(url)
-        # Pulisce le righe vuote
+        # Pulisce le righe vuote nelle colonne fondamentali
         df = df.dropna(subset=['argomento', 'domanda'])
         return df
     except:
@@ -60,11 +67,9 @@ df_completo = carica_esercizi(URL_FOGLIO)
 
 if not df_completo.empty:
     st.sidebar.title("📚 Menu Lezioni")
-    # Protezione TypeError: dropna + astype(str)
     lista_argomenti = sorted(df_completo['argomento'].dropna().astype(str).unique().tolist())
     scelta_argomento = st.sidebar.selectbox("Scegli cosa studiare:", lista_argomenti)
 
-    # Inizializzazione sessione per nuovo argomento
     if 'argomento_attivo' not in st.session_state or st.session_state.argomento_attivo != scelta_argomento:
         st.session_state.argomento_attivo = scelta_argomento
         tutte_le_domande = df_completo[df_completo['argomento'] == scelta_argomento].to_dict('records')
@@ -82,10 +87,13 @@ if not df_completo.empty:
         es = st.session_state.esercizi_scelti[st.session_state.indice]
         st.write(f"**Esercizio {st.session_state.indice + 1} di {len(st.session_state.esercizi_scelti)}**")
         
+        # MOSTRA ISTRUZIONE (se presente nel foglio)
+        if 'istruzione' in es and pd.notna(es['istruzione']):
+            st.markdown(f"<p class='istruzione-testo'>{es['istruzione']}</p>", unsafe_allow_html=True)
+        
         testo_domanda = str(es['domanda'])
         match_opzioni = re.search(r'\[(.*?)\]', testo_domanda)
         
-        # Gestione Risposta Multipla o Aperta
         if match_opzioni:
             domanda_pulita = testo_domanda.split('[')[0].strip()
             opzioni = [opt.strip() for opt in match_opzioni.group(1).split(',')]
@@ -125,20 +133,17 @@ if not df_completo.empty:
                 st.session_state.finito = True
                 st.rerun()
 
-    # --- SCHERMATA FINALE CON APPLAUSI ---
     elif st.session_state.finito:
         st.balloons()
-        
-        # Audio degli applausi
         audio_url = "https://www.myinstants.com/media/sounds/applause_8.mp3"
-        st.components.v1.html(
-            f"""
-            <audio autoplay>
-                <source src="{audio_url}" type="audio/mp3">
-            </audio>
-            """,
-            height=0,
-        )
+        st.components.v1.html(f"<audio autoplay><source src='{audio_url}' type='audio/mp3'></audio>", height=0)
         
         st.header("🎊 Lezione Completata!")
         st.subheader(f"Hai ottenuto un punteggio di {st.session_state.punteggio} su {len(st.session_state.esercizi_scelti)}")
+        
+        if st.button("Ricomincia o cambia lezione 🔄"):
+            st.session_state.argomento_attivo = None
+            st.session_state.finito = False
+            st.rerun()
+else:
+    st.warning("Controlla il foglio Google!")
