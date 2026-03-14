@@ -38,10 +38,10 @@ def aggiungi_sfondo(url_immagine):
         unsafe_allow_html=True
     )
 
-# Funzione per lo squillo di tromba
-def suona_tromba():
-    # Link a un suono di fanfara/tromba gratuito
-    audio_url = "https://www.myinstants.com/media/sounds/trumpet-fanfare.mp3"
+# Funzione per l'applauso
+def applauso():
+    # Link a un applauso gratuito
+    audio_url = "https://www.myinstants.com/media/sounds/applause_8.mp3"
     audio_html = f"""
         <audio autoplay>
             <source src="{audio_url}" type="audio/mp3">
