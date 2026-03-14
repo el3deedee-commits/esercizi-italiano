@@ -122,10 +122,10 @@ if not df_completo.empty:
                 st.session_state.finito = True
                 st.rerun()
 
-    # --- SCHERMATA FINALE CON TROMBA E PALLONCINI ---
+    # --- SCHERMATA FINALE CON APPLAUSO E PALLONCINI ---
     elif st.session_state.finito:
         st.balloons()
-        suona_tromba()
+        applauso()
         st.header("🎊 Lezione Completata!")
         st.subheader(f"Hai ottenuto un punteggio di {st.session_state.punteggio} su {len(st.session_state.esercizi_scelti)}")
         
