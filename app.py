@@ -9,9 +9,6 @@ URL_FOGLIO = "https://docs.google.com/spreadsheets/d/18jIREltozGiHiCnNljLHqRFF-o
 # Configurazione della pagina
 st.set_page_config(page_title="ITALO! Quiz online", page_icon="🇮🇹")
 
-st.write("Gli esercizi per le nostre lezioni.")
-
-
 # --- 2. FUNZIONE PER LO SFONDO VELATO (COLOSSEO) ---
 def aggiungi_sfondo(url_immagine):
     st.markdown(
