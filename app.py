@@ -6,8 +6,11 @@ import re
 # 1. LINK DEL TUO FOGLIO GOOGLE
 URL_FOGLIO = "https://docs.google.com/spreadsheets/d/18jIREltozGiHiCnNljLHqRFF-oMnj-hDDJ5yhH3rWDk/export?format=csv"
 
-st.title("ITALO! Quiz online")
+# Configurazione della pagina
+st.set_page_config(page_title="ITALO! Quiz online", page_icon="🇮🇹")
+
 st.write("Gli esercizi per le nostre lezioni.")
+
 
 # --- 2. FUNZIONE PER LO SFONDO VELATO (COLOSSEO) ---
 def aggiungi_sfondo(url_immagine):
