@@ -9,31 +9,26 @@ URL_FOGLIO = "https://docs.google.com/spreadsheets/d/18jIREltozGiHiCnNljLHqRFF-o
 # Configurazione della pagina
 st.set_page_config(page_title="ITALO! Quiz online", page_icon="🇮🇹")
 
-# --- 2. FUNZIONE PER LO SFONDO VELATO (RECUPERATA) ---
+# --- 2. FUNZIONE PER LO SFONDO (VERSIONE CORRETTA PER PC) ---
 def aggiungi_sfondo(url_immagine):
     st.markdown(
         f"""
         <style>
-        /* Questo crea lo strato semitrasparente fisso sullo sfondo */
-        .stApp::before {{
-            content: "";
-            background-image: url("{url_immagine}");
+        /* Applichiamo lo sfondo direttamente al contenitore principale */
+        .stApp {{
+            background-image: linear-gradient(rgba(255,255,255,0.75), rgba(255,255,255,0.75)), url("{url_immagine}");
             background-attachment: fixed;
             background-size: cover;
             background-position: center;
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            opacity: 0.20; /* Regola qui la trasparenza (0.20 è molto velata) */
-            z-index: -1;
         }}
-        
-        /* Contenitore bianco dell'app */
+
+        /* Rendiamo il contenitore dei contenuti trasparente per far vedere lo sfondo */
         .main .block-container {{
-            background-color: rgba(255, 255, 255, 0.75); 
+            background-color: rgba(255, 255, 255, 0.5); 
             border-radius: 25px;
             padding: 40px;
             margin-top: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }}
         
         /* Stile Istruzione Blu */
@@ -93,7 +88,6 @@ if not df_completo.empty:
         st.write(f"---")
         st.write(f"**Esercizio {st.session_state.indice + 1} di {len(st.session_state.esercizi_scelti)}**")
         
-        # Mostra Istruzione
         if 'istruzione' in es and pd.notna(es['istruzione']):
             st.markdown(f"<span class='istruzione-testo'>{es['istruzione']}</span>", unsafe_allow_html=True)
         
