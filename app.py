@@ -25,28 +25,30 @@ def aggiungi_sfondo(url_immagine):
             z-index: -1;
         }}
         .main .block-container {{
-            background-color: rgba(255, 255, 255, 0.7); 
+            background-color: rgba(255, 255, 255, 0.75); 
             border-radius: 25px;
             padding: 40px;
             margin-top: 30px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }}
         
-        /* STILE AGGIORNATO PER L'ISTRUZIONE */
+        /* STILE PER L'ISTRUZIONE COLORE DIVERSO */
         .istruzione-testo {{
-            color: #333333;       /* Grigio più scuro */
-            font-style: italic;
-            font-size: 1.1em;      /* Leggermente più grande */
-            margin-top: 20px;      /* Spazio sopra */
-            margin-bottom: 10px;   /* Spazio sotto verso la domanda */
+            color: #0047AB;       /* Blu Royal elegante */
+            font-weight: bold;    /* Grassetto */
+            font-style: italic;   /* Corsivo */
+            font-size: 1.15em;    /* Un po' più grande */
+            margin-top: 15px;
+            margin-bottom: 5px;
             display: block;
-            line-height: 1.4;
         }}
         
-        /* Spazio extra per la domanda principale */
-        .stMarkdown h3 {{
-            margin-top: 5px !important;
-            padding-bottom: 20px;
+        /* Spazio per la domanda */
+        .domanda-testo {{
+            color: #000000;
+            font-weight: 800;
+            margin-top: 0px;
+            margin-bottom: 20px;
         }}
         </style>
         """,
@@ -91,10 +93,10 @@ if not df_completo.empty:
 
     if st.session_state.esercizi_scelti and not st.session_state.finito:
         es = st.session_state.esercizi_scelti[st.session_state.indice]
-        st.write(f"---") # Una linea sottile per separare visivamente
+        st.write(f"---")
         st.write(f"**Esercizio {st.session_state.indice + 1} di {len(st.session_state.esercizi_scelti)}**")
         
-        # MOSTRA ISTRUZIONE
+        # MOSTRA ISTRUZIONE IN BLU
         if 'istruzione' in es and pd.notna(es['istruzione']):
             st.markdown(f"<span class='istruzione-testo'>{es['istruzione']}</span>", unsafe_allow_html=True)
         
@@ -104,7 +106,7 @@ if not df_completo.empty:
         if match_opzioni:
             domanda_pulita = testo_domanda.split('[')[0].strip()
             opzioni = [opt.strip() for opt in match_opzioni.group(1).split(',')]
-            st.write(f"### {domanda_pulita}")
+            st.markdown(f"### {domanda_pulita}")
             scelta = st.radio("Seleziona la risposta:", opzioni, index=None, key=f"r_{st.session_state.indice}")
             
             if st.button("Verifica"):
@@ -117,7 +119,7 @@ if not df_completo.empty:
                         st.error(f"Sbagliato. La risposta corretta era: {es['risposta']}")
                 else: st.warning("Seleziona un'opzione!")
         else:
-            st.write(f"### {testo_domanda}")
+            st.markdown(f"### {testo_domanda}")
             risposta_utente = st.text_input("Scrivi qui la tua risposta:", key=f"i_{st.session_state.indice}").strip().lower()
             if st.button("Verifica"):
                 if risposta_utente:
