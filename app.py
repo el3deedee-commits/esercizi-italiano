@@ -9,7 +9,7 @@ URL_FOGLIO = "https://docs.google.com/spreadsheets/d/18jIREltozGiHiCnNljLHqRFF-o
 # Configurazione della pagina
 st.set_page_config(page_title="ITALO! Quiz online", page_icon="🇮🇹")
 
-# --- 2. FUNZIONE PER LO SFONDO VELATO (COLOSSEO) ---
+# --- 2. FUNZIONE PER LO SFONDO E STILI PERSONALIZZATI ---
 def aggiungi_sfondo(url_immagine):
     st.markdown(
         f"""
@@ -31,12 +31,22 @@ def aggiungi_sfondo(url_immagine):
             margin-top: 30px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }}
-        /* Stile per l'istruzione */
+        
+        /* STILE AGGIORNATO PER L'ISTRUZIONE */
         .istruzione-testo {{
-            color: #555;
+            color: #333333;       /* Grigio più scuro */
             font-style: italic;
-            font-size: 0.9em;
-            margin-bottom: -10px;
+            font-size: 1.1em;      /* Leggermente più grande */
+            margin-top: 20px;      /* Spazio sopra */
+            margin-bottom: 10px;   /* Spazio sotto verso la domanda */
+            display: block;
+            line-height: 1.4;
+        }}
+        
+        /* Spazio extra per la domanda principale */
+        .stMarkdown h3 {{
+            margin-top: 5px !important;
+            padding-bottom: 20px;
         }}
         </style>
         """,
@@ -54,7 +64,6 @@ st.write("Gli esercizi per le nostre lezioni.")
 def carica_esercizi(url):
     try:
         df = pd.read_csv(url)
-        # Pulisce le righe vuote nelle colonne fondamentali
         df = df.dropna(subset=['argomento', 'domanda'])
         return df
     except:
@@ -82,11 +91,12 @@ if not df_completo.empty:
 
     if st.session_state.esercizi_scelti and not st.session_state.finito:
         es = st.session_state.esercizi_scelti[st.session_state.indice]
+        st.write(f"---") # Una linea sottile per separare visivamente
         st.write(f"**Esercizio {st.session_state.indice + 1} di {len(st.session_state.esercizi_scelti)}**")
         
-        # MOSTRA ISTRUZIONE (se presente nel foglio)
+        # MOSTRA ISTRUZIONE
         if 'istruzione' in es and pd.notna(es['istruzione']):
-            st.markdown(f"<p class='istruzione-testo'>{es['istruzione']}</p>", unsafe_allow_html=True)
+            st.markdown(f"<span class='istruzione-testo'>{es['istruzione']}</span>", unsafe_allow_html=True)
         
         testo_domanda = str(es['domanda'])
         match_opzioni = re.search(r'\[(.*?)\]', testo_domanda)
@@ -105,8 +115,7 @@ if not df_completo.empty:
                         st.session_state.punteggio += 1
                     else:
                         st.error(f"Sbagliato. La risposta corretta era: {es['risposta']}")
-                else:
-                    st.warning("Seleziona un'opzione!")
+                else: st.warning("Seleziona un'opzione!")
         else:
             st.write(f"### {testo_domanda}")
             risposta_utente = st.text_input("Scrivi qui la tua risposta:", key=f"i_{st.session_state.indice}").strip().lower()
@@ -118,8 +127,7 @@ if not df_completo.empty:
                         st.session_state.punteggio += 1
                     else:
                         st.error(f"Sbagliato. La risposta era: {es['risposta']}")
-                else:
-                    st.warning("Scrivi una risposta!")
+                else: st.warning("Scrivi una risposta!")
 
         st.divider()
         if st.button("Prossimo ➡️"):
@@ -134,10 +142,8 @@ if not df_completo.empty:
         st.balloons()
         audio_url = "https://www.myinstants.com/media/sounds/applause_8.mp3"
         st.components.v1.html(f"<audio autoplay><source src='{audio_url}' type='audio/mp3'></audio>", height=0)
-        
         st.header("🎊 Lezione Completata!")
         st.subheader(f"Hai ottenuto un punteggio di {st.session_state.punteggio} su {len(st.session_state.esercizi_scelti)}")
-        
         if st.button("Ricomincia o cambia lezione 🔄"):
             st.session_state.argomento_attivo = None
             st.session_state.finito = False
