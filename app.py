@@ -9,21 +9,25 @@ URL_FOGLIO = "https://docs.google.com/spreadsheets/d/18jIREltozGiHiCnNljLHqRFF-o
 # Configurazione della pagina
 st.set_page_config(page_title="ITALO! Quiz online", page_icon="🇮🇹")
 
-# --- 2. FUNZIONE PER LO SFONDO E STILI PERSONALIZZATI ---
+# --- 2. FUNZIONE PER LO SFONDO VELATO (RECUPERATA) ---
 def aggiungi_sfondo(url_immagine):
     st.markdown(
         f"""
         <style>
+        /* Questo crea lo strato semitrasparente fisso sullo sfondo */
         .stApp::before {{
             content: "";
             background-image: url("{url_immagine}");
             background-attachment: fixed;
             background-size: cover;
+            background-position: center;
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            opacity: 0.25; 
+            opacity: 0.20; /* Regola qui la trasparenza (0.20 è molto velata) */
             z-index: -1;
         }}
+        
+        /* Contenitore bianco dell'app */
         .main .block-container {{
             background-color: rgba(255, 255, 255, 0.75); 
             border-radius: 25px;
@@ -32,29 +36,22 @@ def aggiungi_sfondo(url_immagine):
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }}
         
-        /* STILE PER L'ISTRUZIONE COLORE DIVERSO */
+        /* Stile Istruzione Blu */
         .istruzione-testo {{
-            color: #0047AB;       /* Blu Royal elegante */
-            font-weight: bold;    /* Grassetto */
-            font-style: italic;   /* Corsivo */
-            font-size: 1.15em;    /* Un po' più grande */
+            color: #0047AB;
+            font-weight: bold;
+            font-style: italic;
+            font-size: 1.15em;
             margin-top: 15px;
             margin-bottom: 5px;
             display: block;
-        }}
-        
-        /* Spazio per la domanda */
-        .domanda-testo {{
-            color: #000000;
-            font-weight: 800;
-            margin-top: 0px;
-            margin-bottom: 20px;
         }}
         </style>
         """,
         unsafe_allow_html=True
     )
 
+# Applichiamo lo sfondo del Colosseo
 aggiungi_sfondo("https://images.unsplash.com/photo-1552832230-c0197dd311b5?q=80&w=1996")
 
 # Titoli dell'app
@@ -96,7 +93,7 @@ if not df_completo.empty:
         st.write(f"---")
         st.write(f"**Esercizio {st.session_state.indice + 1} di {len(st.session_state.esercizi_scelti)}**")
         
-        # MOSTRA ISTRUZIONE IN BLU
+        # Mostra Istruzione
         if 'istruzione' in es and pd.notna(es['istruzione']):
             st.markdown(f"<span class='istruzione-testo'>{es['istruzione']}</span>", unsafe_allow_html=True)
         
@@ -152,3 +149,6 @@ if not df_completo.empty:
             st.rerun()
 else:
     st.warning("Controlla il foglio Google!")
+
+st.sidebar.markdown("---")
+st.sidebar.write("In bocca al lupo con lo studio! 🇮🇹")
