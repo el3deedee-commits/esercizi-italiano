@@ -9,20 +9,17 @@ URL_FOGLIO = "https://docs.google.com/spreadsheets/d/18jIREltozGiHiCnNljLHqRFF-o
 # Configurazione della pagina
 st.set_page_config(page_title="ITALO! Quiz online", page_icon="🇮🇹")
 
-# --- 2. FUNZIONE PER LO SFONDO (VERSIONE CORRETTA PER PC) ---
+# --- 2. FUNZIONE PER LO SFONDO ---
 def aggiungi_sfondo(url_immagine):
     st.markdown(
         f"""
         <style>
-        /* Applichiamo lo sfondo direttamente al contenitore principale */
         .stApp {{
             background-image: linear-gradient(rgba(255,255,255,0.75), rgba(255,255,255,0.75)), url("{url_immagine}");
             background-attachment: fixed;
             background-size: cover;
             background-position: center;
         }}
-
-        /* Rendiamo il contenitore dei contenuti trasparente per far vedere lo sfondo */
         .main .block-container {{
             background-color: rgba(255, 255, 255, 0.5); 
             border-radius: 25px;
@@ -30,8 +27,6 @@ def aggiungi_sfondo(url_immagine):
             margin-top: 30px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }}
-        
-        /* Stile Istruzione Blu */
         .istruzione-testo {{
             color: #0047AB;
             font-weight: bold;
@@ -46,14 +41,23 @@ def aggiungi_sfondo(url_immagine):
         unsafe_allow_html=True
     )
 
-# Applichiamo lo sfondo del Colosseo
 aggiungi_sfondo("https://images.unsplash.com/photo-1552832230-c0197dd311b5?q=80&w=1996")
 
-# Titoli dell'app
+# --- 3. PROTEZIONE CON PASSWORD ---
+st.sidebar.title("🔐 Accesso Riservato")
+password_segreta = "italo2026"  # <--- CAMBIA QUESTA QUANDO VUOI
+inserimento = st.sidebar.text_input("Inserisci la password:", type="password")
+
+if inserimento != password_segreta:
+    st.title("🇮🇹 ITALO! Quiz online")
+    st.info("Benvenuto! Per favore, inserisci la password nella barra laterale per accedere agli esercizi delle lezioni.")
+    st.stop() # Interrompe l'app qui finché la password non è corretta
+
+# --- SE LA PASSWORD È CORRETTA, MOSTRA IL RESTO ---
 st.title("ITALO! Quiz online")
 st.write("Gli esercizi per le nostre lezioni.")
 
-# --- 3. CARICAMENTO DATI ---
+# --- 4. CARICAMENTO DATI ---
 @st.cache_data(ttl=60)
 def carica_esercizi(url):
     try:
@@ -66,6 +70,7 @@ def carica_esercizi(url):
 df_completo = carica_esercizi(URL_FOGLIO)
 
 if not df_completo.empty:
+    st.sidebar.markdown("---")
     st.sidebar.title("📚 Menu Lezioni")
     lista_argomenti = sorted(df_completo['argomento'].dropna().astype(str).unique().tolist())
     scelta_argomento = st.sidebar.selectbox("Scegli cosa studiare:", lista_argomenti)
@@ -141,8 +146,3 @@ if not df_completo.empty:
             st.session_state.argomento_attivo = None
             st.session_state.finito = False
             st.rerun()
-else:
-    st.warning("Controlla il foglio Google!")
-
-st.sidebar.markdown("---")
-st.sidebar.write("In bocca al lupo con lo studio! 🇮🇹")
