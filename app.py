@@ -43,17 +43,37 @@ def aggiungi_sfondo(url_immagine):
 
 aggiungi_sfondo("https://images.unsplash.com/photo-1552832230-c0197dd311b5?q=80&w=1996")
 
-# --- 3. PROTEZIONE CON PASSWORD ---
+# --- 3. PROTEZIONE CON PASSWORD (VERSIONE "PULITA") ---
 st.sidebar.title("🔐 Accesso Riservato")
-password_segreta = "italo2026"  # <--- CAMBIA QUESTA QUANDO VUOI
-inserimento = st.sidebar.text_input("Inserisci la password:", type="password")
+password_segreta = "italo2026" 
 
-if inserimento != password_segreta:
+# Inizializziamo lo stato dell'autenticazione se non esiste
+if 'autenticato' not in st.session_state:
+    st.session_state.autenticato = False
+
+# Se non è ancora autenticato, mostra il campo password
+if not st.session_state.autenticato:
+    inserimento = st.sidebar.text_input("Inserisci la password:", type="password")
+    if inserimento == password_segreta:
+        st.session_state.autenticato = True
+        st.rerun()
+    elif inserimento != "":
+        st.sidebar.error("Password errata ❌")
+    
+    # Blocco della schermata principale per utenti non autenticati
     st.title("🇮🇹 ITALO! Quiz online")
-    st.info("Benvenuto! Per favore, inserisci la password nella barra laterale per accedere agli esercizi delle lezioni.")
-    st.stop() # Interrompe l'app qui finché la password non è corretta
+    st.info("Benvenuto! Per favore, inserisci la password nella barra laterale per accedere agli esercizi.")
+    st.stop()
 
-# --- SE LA PASSWORD È CORRETTA, MOSTRA IL RESTO ---
+# Se è autenticato, mostra un messaggio di successo al posto del campo password
+else:
+    st.sidebar.success("✅ Accesso effettuato")
+    if st.sidebar.button("Esci 🔒"):
+        st.session_state.autenticato = False
+        st.rerun()
+
+
+# --- DA QUI IN POI L'APP È VISIBILE SOLO SE AUTENTICATI ---
 st.title("ITALO! Quiz online")
 st.write("Gli esercizi per le nostre lezioni.")
 
