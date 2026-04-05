@@ -129,7 +129,7 @@ if not df_completo.empty:
                 if scelta:
                     st.session_state.totali += 1
                     if scelta.lower() == str(es['risposta']).lower().strip():
-                        st.success("Bravissimo! 🎉")
+                        st.success("Benissimo! 🎉")
                         st.session_state.punteggio += 1
                     else:
                         st.error(f"Sbagliato. La risposta corretta era: {es['risposta']}")
