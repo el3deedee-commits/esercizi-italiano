@@ -105,7 +105,7 @@ if not df_completo.empty:
         st.session_state.totali = 0
         st.session_state.finito = False
 
-    st.subheader(f"🏛️ Sezione: {scelta_argomento}")
+    st.subheader(f"🏛️ {scelta_argomento}")
     st.metric(label="Punteggio attuale", value=f"{st.session_state.punteggio} su {st.session_state.totali}")
 
     if st.session_state.esercizi_scelti and not st.session_state.finito:
